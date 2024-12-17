@@ -3,19 +3,20 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import fetch from 'node-fetch';
 import cors from 'cors';
 
-const app = express();
+global.fetch = fetch; // Polyfill for fetch in Node.js < 18
 
+const app = express();
 app.use(express.json());
 app.use(cors());
 
-const genAI = new GoogleGenerativeAI('AIzaSyBlOpa-wekM0lhQuqI4U6anUDnk1G0NPS4');
+const genAI = new GoogleGenerativeAI('AIzaSyCsWsmppT3zl85WNpKPX6-qAUbMycVfqCM');
 
-// API route to generate content with POST request
+// API route to generate content
 app.post('/generate-content', async (req, res) => {
-  const { prompt } = req.body; // Get the prompt from the request body
+  const { prompt } = req.body;
   try {
-    const r = await genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    const content = await r.generateContent(prompt); // Use the prompt from the body
+    const model = await genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const content = await model.generateContent(prompt);
     res.json({ response: content });
   } catch (err) {
     console.error('Error:', err);
@@ -28,11 +29,8 @@ app.get('/', (req, res) => {
   res.send('Hello, World!');
 });
 
-// Start the server
+// Start server
 const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
-
-
-
